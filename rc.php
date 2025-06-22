@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RightClick Esports Center | Myitkyina</title>
+    <!-- Bootstrap & FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00bcd4;
+            --secondary: #2196f3;
+            --accent: #ff9800;
+            --light: #e0e7ef;
+            --dark: #0a0f1a;
+        }
+        body {
+            background: linear-gradient(120deg, #0a0f1a 0%, #181f2a 100%);
+            color: var(--light);
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+        }
+        .navbar {
+            background: linear-gradient(90deg, #0a0f1a 0%, #181f2a 100%);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff !important;
+            transition: transform 0.3s ease;
+        }
+        .navbar-brand:hover {
+            transform: scale(1.05);
+            color: var(--primary) !important;
+        }
+        .main-section {
+            padding: 70px 0 60px 0;
+        }
+        .rc-title {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+        }
+        .rc-highlight {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        .rc-card {
+            background: rgba(24, 31, 42, 0.92);
+            color: var(--light);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border: 1.5px solid #2196f3;
+            padding: 2rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .rc-card h3 {
+            color: var(--primary);
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        .rc-card ul {
+            margin-left: 1.2rem;
+        }
+        .rc-card li {
+            margin-bottom: 0.5rem;
+        }
+        @media (max-width: 767.98px) {
+            .main-section {
+                padding: 32px 0 20px 0;
+            }
+            .rc-title {
+                font-size: 1.4rem;
+            }
+            .rc-card {
+                padding: 1rem !important;
+                margin-bottom: 1rem;
+            }
+        }
+        footer {
+            background: linear-gradient(90deg, #0a0f1a 0%, #181f2a 100%) !important;
+            color: #fff;
+            border-top: 3px solid var(--secondary);
+        }
+        .text-light-emphasis {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+        .hover-primary {
+            transition: all 0.3s ease;
+        }
+        .hover-primary:hover {
+            color: var(--accent) !important;
+            transform: translateY(-1px);
+        }
+        footer h5 {
+            color: #ffffff;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        footer ul li a {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        footer .social-icons a {
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        footer .social-icons a:hover {
+            transform: translateY(-3px);
+        }
+        footer hr {
+            opacity: 0.1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header/Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.php">
+                <i class="fas fa-gamepad me-2"></i>RightClick Esports Center
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Section -->
+    <section class="main-section">
+        <div class="container">
+            <div class="rc-card mb-5 text-center">
+                <h1 class="rc-title">RightClick Esports Center</h1>
+                <p class="lead">Myitkyina's premier destination for gamers, tournaments, and a thriving esports community.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="rc-card h-100">
+                        <h3>Our Mission</h3>
+                        <p>To provide a world-class gaming environment where players of all ages and skill levels can connect, compete, and grow. We aim to foster a positive, inclusive, and competitive esports culture in Myitkyina.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="rc-card h-100">
+                        <h3>What We Offer</h3>
+                        <ul>
+                            <li><span class="rc-highlight">High-End Gaming PCs:</span> Experience the latest games on top-tier hardware with ultra-fast internet.</li>
+                            <li><span class="rc-highlight">Console Gaming:</span> Play on the newest PlayStation and Xbox consoles with friends.</li>
+                            <li><span class="rc-highlight">Esports Tournaments:</span> Regular competitions for popular titles with exciting prizes and live streaming.</li>
+                            <li><span class="rc-highlight">Community Events:</span> Meetups, workshops, and fun events for gamers of all backgrounds.</li>
+                            <li><span class="rc-highlight">Snack Bar & Lounge:</span> Relax and recharge with snacks, drinks, and a comfortable lounge area.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="rc-card h-100">
+                        <h3>Why Choose RightClick?</h3>
+                        <ul>
+                            <li>Friendly, knowledgeable staff and a safe, welcoming environment.</li>
+                            <li>State-of-the-art equipment and regular upgrades.</li>
+                            <li>Open late for your convenience.</li>
+                            <li>Opportunities to join teams, make friends, and improve your skills.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="rc-card h-100">
+                        <h3>Join Our Community</h3>
+                        <p>Whether you're a casual gamer, a competitive player, or just looking for a fun place to hang out, RightClick Esports Center is your home for gaming in Myitkyina. Follow us on social media for the latest events and updates!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3">About RightClick Esports Center</h5>
+                    <p class="text-light-emphasis">Myitkyina's premier destination for gamers, tournaments, and a thriving esports community. We provide high-end gaming, events, and a welcoming space for all players.</p>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <h5 class="text-white">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-1">
+                            <a href="index.php" class="text-white text-decoration-none">Home</a>
+                        </li>
+                        <li class="mb-1">
+                            <a href="solar_shop.php" class="text-white text-decoration-none">Solar Shop</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="mb-3">Contact Us</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i>09 773 640 825</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i>info@rightclick.com</li>
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>Pyihtawngsu Set Sat Street, Myitkyina</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4 bg-light">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0 text-light-emphasis">&copy; 2024 RightClick Esports Center. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
+                    <a href="#" class="text-light-emphasis text-decoration-none me-3 hover-primary"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="text-light-emphasis text-decoration-none me-3 hover-primary"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-light-emphasis text-decoration-none me-3 hover-primary"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-light-emphasis text-decoration-none hover-primary"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 
