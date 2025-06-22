@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -368,7 +369,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="solar_shop.php">
+            <a class="navbar-brand" href="solar_shop.html">
                 <i class="fas fa-solar-panel me-2"></i>Myitkyina Solar Solutions
             </a>
         </div>
@@ -377,7 +378,7 @@
         <div class="container">
             <h1 class="display-4 mb-4">Myitkyina Solar Solutions</h1>
             <p class="lead mb-4">Power your future with clean, renewable solar energy</p>
-            <a href="solar_list.php" class="btn btn-primary btn-lg">Explore Products</a>
+            <a href="solar_list.html" class="btn btn-primary btn-lg">Explore Products</a>
         </div>
     </section>
     <!-- Services Section -->
@@ -659,7 +660,7 @@
                             <a href="#" class="text-white text-decoration-none">Home</a>
                         </li>
                         <li class="mb-1">
-                            <a href="solar_list.php" class="text-white text-decoration-none">Products</a>
+                            <a href="solar_list.html" class="text-white text-decoration-none">Products</a>
                         </li>
                     </ul>
                 </div>
