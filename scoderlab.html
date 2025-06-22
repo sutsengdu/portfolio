@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCoderLab | Programming Training Center</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #00bcd4;
+            --secondary: #2196f3;
+            --accent: #ff9800;
+            --light: #e0e7ef;
+            --dark: #0a0f1a;
+        }
+
+        body {
+            background: linear-gradient(120deg, #0a0f1a 0%, #181f2a 100%);
+            color: var(--light);
+            overflow-x: hidden;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: linear-gradient(90deg, rgba(10,15,26,0.98) 0%, rgba(24,31,42,0.98) 100%);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            border-bottom: 3px solid #2196f3;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: clamp(1.2rem, 2vw, 2rem);
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            border-radius: 8px;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: clamp(1rem, 1.5vw, 1.1rem);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--secondary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--secondary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: 120px;
+            text-align: center;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.2rem, 7vw, 4rem);
+            margin-bottom: 20px;
+            line-height: 1.1;
+            color: #fff;
+            text-shadow: 0 2px 12px rgba(33, 150, 243, 0.18), 0 1px 0 #0002;
+        }
+        
+        .hero h1 span {
+            color: var(--primary);
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-btn {
+            display: inline-block;
+            background: var(--primary);
+            color: #18181b;
+            padding: 15px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: clamp(1rem, 2vw, 1.1rem);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px #00bcd455;
+        }
+
+        .hero-btn:hover {
+            background: #2196f3;
+            color: #fff;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px #2196f388;
+        }
+
+        /* Sections */
+        section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .section-title h2 {
+            font-size: clamp(1.5rem, 5vw, 2.8rem);
+            display: inline-block;
+            color: #00bcd4;
+            text-shadow: 0 2px 12px #2196f355, 0 1px 0 #0002;
+            position: relative;
+        }
+
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+
+        /* Course Cards */
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .course-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .course-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 30px rgba(0,188,212,0.3);
+            border-color: var(--primary);
+        }
+
+        .course-card i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .course-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .course-card p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .course-card a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .course-card a:hover {
+            text-decoration: underline;
+        }
+
+        /* About Section */
+        #about p {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        /* Contact Section */
+        #contact .contact-info {
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        #contact .contact-info a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        #contact .contact-info a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Footer */
+        footer {
+            background: #0a0f1a;
+            padding: 20px 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">
+                <img src="logo/SCoderLab.png" alt="SCoderLab Logo">
+                SCoder<span>Lab</span>
+            </a>
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#courses">Courses</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Welcome to <span>SCoderLab</span></h1>
+                <p>Your journey to becoming a professional developer starts here. We provide top-tier programming courses with hands-on projects and expert mentorship.</p>
+                <a href="#courses" class="hero-btn">Explore Courses</a>
+            </div>
+        </section>
+
+        <section id="courses" class="container">
+            <div class="section-title">
+                <h2>Our Courses</h2>
+            </div>
+            <div class="courses-grid">
+                <div class="course-card">
+                    <i class="fas fa-code"></i>
+                    <h3>Web Development Bootcamp</h3>
+                    <p>Master front-end and back-end technologies including HTML, CSS, JavaScript, Node.js, and React. Build real-world applications and deploy them.</p>
+                    <a href="#">Learn More &rarr;</a>
+                </div>
+                <div class="course-card">
+                    <i class="fas fa-database"></i>
+                    <h3>Python for Data Science</h3>
+                    <p>Dive into the world of data with Python. Learn libraries like Pandas, NumPy, Matplotlib, and Scikit-learn to analyze and visualize data.</p>
+                    <a href="#">Learn More &rarr;</a>
+                </div>
+                <div class="course-card">
+                    <i class="fab fa-java"></i>
+                    <h3>Java Fundamentals</h3>
+                    <p>Learn the fundamentals of Java programming, object-oriented principles, and build robust applications with one of the most popular languages.</p>
+                    <a href="#">Learn More &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="container">
+            <div class="section-title">
+                <h2>About Us</h2>
+            </div>
+            <p>SCoderLab was founded with the mission to provide accessible, high-quality programming education for everyone. Our instructors are industry experts passionate about teaching and helping students achieve their career goals in the tech industry. We believe in learning by doing, so our curriculum is heavily focused on practical, hands-on projects.</p>
+        </section>
+
+        <section id="contact" class="container">
+            <div class="section-title">
+                <h2>Contact Us</h2>
+            </div>
+            <div class="contact-info">
+                <p>Have questions? We'd love to hear from you.</p>
+                <p>Email us at: <a href="mailto:info@scoderlab.com">info@scoderlab.com</a></p>
+                <p>Follow us on social media!</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 SCoderLab. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html> 
