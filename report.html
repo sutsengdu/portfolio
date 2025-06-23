@@ -49,6 +49,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       position: relative;
       margin-bottom: 25px;
+      border-radius: 12px;
     }
     .header-content { flex-grow: 1; }
     .app-title {
@@ -75,6 +76,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      white-space: nowrap;
     }
     .lang-toggle:hover { background: rgba(255,255,255,0.25); }
     .dashboard {
@@ -175,6 +177,18 @@
       border-radius: var(--radius);
       box-shadow: 0 2px 8px rgba(0,0,0,0.04);
       margin-top: 20px;
+      position: relative;
+      padding-bottom: 32px;
+    }
+    .table-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 20px;
+      background: linear-gradient(to left, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+      pointer-events: none;
     }
     table {
       width: 100%;
@@ -182,7 +196,7 @@
       min-width: 600px;
     }
     th, td {
-      padding: 14px 12px;
+      padding: 10px 8px;
       text-align: left;
       border-bottom: 1px solid var(--border);
     }
@@ -192,6 +206,7 @@
       color: var(--primary);
       position: sticky;
       top: 0;
+      white-space: nowrap;
     }
     tr:nth-child(even) { background: #f8fafc; }
     tr:hover { background: #e3f2fd; }
@@ -252,28 +267,62 @@
       font-weight: 500;
       color: var(--text-light);
     }
+    
+    /* Responsive styles */
     @media (max-width: 900px) {
       .app-title { font-size: 1.5rem; }
       .dashboard { grid-template-columns: 1fr; }
       .card { padding: 20px; }
-      th, td { padding: 12px 10px; }
+      th, td { padding: 8px 6px; }
+      .card-title { font-size: 1.3rem; }
+      .lang-toggle { padding: 6px 12px; font-size: 0.85rem; }
     }
-    @media (max-width: 600px) {
-      .header-container { flex-direction: column; text-align: center; gap: 15px; }
-      .lang-toggle { position: absolute; top: 15px; right: 15px; }
-      .form-row { flex-direction: column; gap: 15px; }
-      .export-controls { flex-direction: column; align-items: stretch; }
-      .summary-grid { grid-template-columns: 1fr; }
-      .summary-value { font-size: 1.6rem; }
-    }
-    @media (max-width: 480px) {
+    
+    @media (max-width: 768px) {
       .container { padding: 15px; }
-      .card { padding: 18px; }
+      .header-container { padding: 12px 15px; }
       .app-title { font-size: 1.3rem; }
+      .capital-info { font-size: 0.9rem; }
+      .card { padding: 15px; }
       .card-title { font-size: 1.2rem; }
-      input, select, button { padding: 12px; }
-      th, td { padding: 10px 8px; font-size: 0.9rem; }
+      .form-row { flex-direction: column; gap: 10px; }
+      .form-row > * { flex: 1 1 100%; }
+      input, select, button { padding: 12px; font-size: 0.95rem; }
+      .export-controls { flex-direction: column; align-items: stretch; }
+    }
+    
+    @media (max-width: 600px) {
+      .header-container { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .lang-toggle { position: static; margin-top: 10px; }
+      .card { padding: 12px; }
+      .card-title { font-size: 1.1rem; }
+      th, td { padding: 8px 4px; font-size: 0.9rem; }
+      input, select, button { padding: 10px; font-size: 0.9rem; }
       .action-btn { padding: 5px 8px; font-size: 0.8rem; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .summary-value { font-size: 1.5rem; }
+      .table-container { padding-bottom: 16px; }
+      .card.expense-logs { margin-bottom: 16px; }
+    }
+    
+    @media (max-width: 480px) {
+      .container { padding: 10px; }
+      .header-container { padding: 10px; }
+      .app-title { font-size: 1.1rem; }
+      .capital-info { font-size: 0.8rem; }
+      .card { padding: 10px; }
+      .card-title { font-size: 1rem; }
+      th, td { padding: 6px 3px; font-size: 0.85rem; }
+      input, select, button { padding: 8px; font-size: 0.85rem; }
+      .action-btn { padding: 4px 6px; font-size: 0.75rem; }
+      .lang-toggle { font-size: 0.8rem; padding: 5px 10px; }
+    }
+    
+    @media (max-width: 360px) {
+      .app-title { font-size: 1rem; }
+      .card-title { font-size: 0.95rem; }
+      th, td { font-size: 0.8rem; }
+      input, select, button { font-size: 0.8rem; padding: 7px; }
     }
   </style>
 </head>
@@ -341,7 +390,7 @@
         <button id="addBtn" class="btn-success"></button>
       </div>
     </div>
-    <div class="card">
+    <div class="card expense-logs">
       <div class="card-header">
         <h2 class="card-title" id="logsTitle"></h2>
         <div class="card-icon">
@@ -484,8 +533,8 @@
       member: "Member",
       add: "Add",
       update: "Update",
-      logsTitle: "Logs",
-      logsTitle1: "Logs",
+      logsTitle: "Expense Logs",
+      logsTitle1: "Project Income Logs",
       thDate: "Date",
       thDesc: "Description",
       thLogMember: "Member",
@@ -527,8 +576,8 @@
       member: "အမည်",
       add: "ထည့်မည်",
       update: "ပြင်မည်",
-      logsTitle: "မှတ်တမ်းများ",
-      logsTitle1: "မှတ်တမ်းများ",
+      logsTitle: "အသုံးစရိတ် မှတ်တမ်းများ",
+      logsTitle1: "ပရောဂျက်ဝင်ငွေ မှတ်တမ်းများ",
       thDate: "နေ့စွဲ",
       thDesc: "ဖော်ပြချက်",
       thLogMember: "အမည်",
@@ -783,11 +832,15 @@
   });
 
   // Export PDF
+  function getLocale() {
+    return lang === 'my' ? 'my-MM' : 'en-US';
+  }
   window.exportLogsPDF = function() {
     const t = LANGS[lang];
     const selected = document.getElementById('exportTableSelect').value;
     const doc = new window.jspdf.jsPDF();
     let head = [], body = [], filename = '';
+    const locale = getLocale();
     if (selected === 'main') {
       head = [[t.thMember, t.thInitial, t.thRole]];
       for (let i = 0; i < members.length; i++) {
@@ -817,7 +870,7 @@
       head = [[t.thDate, t.thDesc, t.thAmount]];
       for (const id in window.currentIncomes) {
         const entry = window.currentIncomes[id];
-        const date = entry.date ? new Date(entry.date).toLocaleString() : '-';
+        const date = entry.date ? new Date(entry.date).toLocaleString(locale) : '-';
         body.push([
           date,
           entry.desc,
@@ -829,7 +882,7 @@
       head = [[t.thDate, t.thDesc, t.thLogMember, t.thAmount]];
       for (const id in window.currentLogs) {
         const entry = window.currentLogs[id];
-        const date = entry.date ? new Date(entry.date).toLocaleString() : '-';
+        const date = entry.date ? new Date(entry.date).toLocaleString(locale) : '-';
         body.push([
           date,
           entry.desc,
@@ -848,6 +901,7 @@
     const t = LANGS[lang];
     const selected = document.getElementById('exportTableSelect').value;
     let ws_data = [], filename = '';
+    const locale = getLocale();
     if (selected === 'main') {
       ws_data = [[t.thMember, t.thInitial, t.thRole]];
       for (let i = 0; i < members.length; i++) {
@@ -877,7 +931,7 @@
       ws_data = [[t.thDate, t.thDesc, t.thAmount]];
       for (const id in window.currentIncomes) {
         const entry = window.currentIncomes[id];
-        const date = entry.date ? new Date(entry.date).toLocaleString() : '-';
+        const date = entry.date ? new Date(entry.date).toLocaleString(locale) : '-';
         ws_data.push([
           date,
           entry.desc,
@@ -889,7 +943,7 @@
       ws_data = [[t.thDate, t.thDesc, t.thLogMember, t.thAmount]];
       for (const id in window.currentLogs) {
         const entry = window.currentLogs[id];
-        const date = entry.date ? new Date(entry.date).toLocaleString() : '-';
+        const date = entry.date ? new Date(entry.date).toLocaleString(locale) : '-';
         ws_data.push([
           date,
           entry.desc,
