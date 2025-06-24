@@ -193,7 +193,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 600px;
+   
     }
     th, td {
       padding: 10px 8px;
@@ -289,6 +289,81 @@
       .form-row > * { flex: 1 1 100%; }
       input, select, button { padding: 12px; font-size: 0.95rem; }
       .export-controls { flex-direction: column; align-items: stretch; }
+
+      /* Responsive Table Styles */
+      .table-container table thead {
+        display: none; /* Hide table headers on mobile */
+      }
+      .table-container table .data-row {
+        display: block;
+        width: 100%;
+        margin-bottom: 1rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1rem;
+        background: #fff !important; /* Override striping for card view */
+        box-shadow: var(--shadow);
+      }
+      .table-container table .data-row td {
+        display: flex;
+        justify-content: space-between;
+        text-align: right;
+        padding: 0.75rem 0.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .table-container table .data-row td:last-child {
+        border-bottom: none;
+      }
+      .table-container table .data-row td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        text-align: left;
+        padding-right: 1rem;
+        color: var(--primary);
+      }
+      /* Prevent summary rows from turning into cards */
+      .table-container table .summary-row td {
+        display: table-cell;
+        text-align: left;
+      }
+      .table-container table .summary-row td:nth-child(2) {
+        text-align: right;
+        font-weight: 600;
+      }
+
+      /* Force table to not behave like a table on mobile */
+      .table-container table,
+      .table-container table tbody,
+      .table-container table tfoot,
+      .table-container table tr {
+        display: block;
+        width: 100%;
+      }
+
+      .table-container table tfoot tr {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: #e0e7ef;
+        border-radius: 0 0 var(--radius) var(--radius);
+        margin-top: 1rem;
+      }
+
+      .table-container table tfoot th {
+        padding: 0;
+        border: none;
+        background: transparent;
+        color: var(--primary-dark);
+        font-weight: 700;
+      }
+      
+      .table-container table tfoot th[colspan] {
+        text-align: left;
+        color: var(--text);
+        font-weight: 600;
+      }
+      /* End Responsive Table Styles */
     }
     
     @media (max-width: 600px) {
@@ -302,7 +377,7 @@
       .summary-grid { grid-template-columns: 1fr; }
       .summary-value { font-size: 1.5rem; }
       .table-container { padding-bottom: 16px; }
-      .card.expense-logs { margin-bottom: 16px; }
+      .card.expense-logs { margin-bottom: 36px; }
     }
     
     @media (max-width: 480px) {
@@ -397,7 +472,6 @@
           <i class="fas fa-file-invoice-dollar"></i>
         </div>
       </div>
-      <div class="table-container">
         <table id="logTable">
           <thead>
             <tr>
@@ -416,7 +490,6 @@
             </tr>
           </tfoot>
         </table>
-      </div>
     </div>
     <div class="dashboard">
       <div class="card">
@@ -582,7 +655,7 @@
       thDesc: "ဖော်ပြချက်",
       thLogMember: "အမည်",
       thAmount: "ငွေပမာဏ",
-      thActions: "စုစုပေါင်း",
+      thActions: "လုပ်ဆောင်ချက်များ",
       edit: "ပြင်ရန်",
       del: "ဖျက်ရန်",
       alert: "ကျေးဇူးပြု၍ မှန်ကန်သော ဖော်ပြချက်နှင့် ငွေပမာဏ ထည့်ပါ။",
@@ -686,55 +759,54 @@
       totalExpensesValue += window.currentLogs[id].amount || 0;
     }
     const roles = ['Member', 'Member', 'Member', 'Member']; // You can customize roles here
+    const t = LANGS[lang];
+    // Add data rows for members
     members.forEach((name, i) => {
       sumInitial += initialShare;
       memberTable.innerHTML += `
-        <tr>
-          <td>${name}</td>
-          <td>${initialShare.toLocaleString()}</td>
-          <td>${roles[i]}</td>
+        <tr class="data-row">
+          <td data-label="${t.thMember}">${name}</td>
+          <td data-label="${t.thInitial}">${initialShare.toLocaleString()}</td>
+          <td data-label="${t.thRole}">${roles[i]}</td>
         </tr>
       `;
     });
-    const t = LANGS[lang];
-    // Add Update row (net change)
+
     const netChange = totalIncomeValue - totalExpensesValue;
     memberTable.innerHTML += `
-      <tr style=\"font-weight:bold; background:#f4f4f4; color:#333;\">
+      <tr style="font-weight:bold; background:#f4f4f4; color:#333;" class="summary-row">
         <td>${t.updateRow}</td>
         <td>${netChange >= 0 ? '+' : ''}${netChange.toLocaleString()}</td>
         <td></td>
       </tr>
     `;
-    // Add Project Income row
     memberTable.innerHTML += `
-      <tr style=\"font-weight:bold; background:#e6ffe6; color:#333;\">
+      <tr style="font-weight:bold; background:#e6ffe6; color:#333;" class="summary-row">
         <td>${t.incomeRow}</td>
         <td>+${totalIncomeValue.toLocaleString()}</td>
         <td></td>
       </tr>
     `;
-    // Add Expenses row
     memberTable.innerHTML += `
-      <tr style=\"font-weight:bold; background:#ffe6e6; color:#333;\">
+      <tr style="font-weight:bold; background:#ffe6e6; color:#333;" class="summary-row">
         <td>${t.expenseRow}</td>
         <td>-${totalExpensesValue.toLocaleString()}</td>
         <td></td>
       </tr>
     `;
-    // Add Remaining row
     const remaining = sumInitial + totalIncomeValue - totalExpensesValue;
     memberTable.innerHTML += `
-      <tr style=\"font-weight:bold; background:#e0e7ef; color:#222;\">
+      <tr style="font-weight:bold; background:#e0e7ef; color:#222;" class="summary-row">
         <td>${t.thRemaining}</td>
         <td>${remaining.toLocaleString()}</td>
         <td></td>
       </tr>
     `;
-    thTotal.textContent = t ? t.thActions : 'Total';
-    totalInitial.textContent = sumInitial.toLocaleString();
-    totalExpenses.textContent = '';
-    currentTotalDiv.textContent = (t ? t.thRemaining : 'Current Total Amount') + ': ' + remaining.toLocaleString() + ' MMK';
+    // The footer for the main table is not needed as summary rows are used instead.
+    // thTotal.textContent = t ? t.thActions : 'Total';
+    // totalInitial.textContent = sumInitial.toLocaleString();
+    // totalExpenses.textContent = '';
+    // currentTotalDiv.textContent = (t ? t.thRemaining : 'Current Total Amount') + ': ' + remaining.toLocaleString() + ' MMK';
   }
 
   function renderLogs(data) {
@@ -746,14 +818,14 @@
       const date = entry.date ? new Date(entry.date).toLocaleString() : '-';
       total += entry.amount;
       logBody.innerHTML += `
-        <tr>
-          <td>${date}</td>
-          <td>${entry.desc}</td>
-          <td>${members[entry.member]}</td>
-          <td>${entry.amount.toLocaleString()} MMK</td>
-          <td>
-            <button onclick="editLog('${id}')">${t.edit}</button>
-            <button onclick="deleteLog('${id}')">${t.del}</button>
+        <tr class="data-row">
+          <td data-label="${t.thDate}">${date}</td>
+          <td data-label="${t.thDesc}">${entry.desc}</td>
+          <td data-label="${t.thLogMember}">${members[entry.member]}</td>
+          <td data-label="${t.thAmount}">${entry.amount.toLocaleString()} MMK</td>
+          <td data-label="${t.thActions}">
+            <button onclick="editLog('${id}')" class="action-btn btn-warning">${t.edit}</button>
+            <button onclick="deleteLog('${id}')" class="action-btn btn-danger">${t.del}</button>
           </td>
         </tr>
       `;
@@ -971,13 +1043,13 @@
       const date = entry.date ? new Date(entry.date).toLocaleString() : '-';
       sumIncome += entry.amount;
       incomeBody.innerHTML += `
-        <tr>
-          <td>${date}</td>
-          <td>${entry.desc}</td>
-          <td>${entry.amount.toLocaleString()} MMK</td>
-          <td>
-            <button onclick="editIncome('${id}')">${t.edit}</button>
-            <button onclick="deleteIncome('${id}')">${t.del}</button>
+        <tr class="data-row">
+          <td data-label="${t.thIncomeDate}">${date}</td>
+          <td data-label="${t.thIncomeDesc}">${entry.desc}</td>
+          <td data-label="${t.thIncomeAmount}">${entry.amount.toLocaleString()} MMK</td>
+          <td data-label="${t.thActions}">
+            <button onclick="editIncome('${id}')" class="action-btn btn-warning">${t.edit}</button>
+            <button onclick="deleteIncome('${id}')" class="action-btn btn-danger">${t.del}</button>
           </td>
         </tr>
       `;
