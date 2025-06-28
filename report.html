@@ -703,7 +703,6 @@
     document.getElementById('thDesc').textContent = t.thDesc;
     document.getElementById('thLogMember').textContent = t.thLogMember;
     document.getElementById('thAmount').textContent = t.thAmount;
-    thTotal.textContent = t ? t.thActions : 'Total';
     // Member select
     const memberSel = document.getElementById('member');
     memberSel.innerHTML = '';
@@ -908,15 +907,13 @@
   });
 
   // Export PDF
-  function getLocale() {
-    return lang === 'my' ? 'my-MM' : 'en-US';
-  }
   window.exportLogsPDF = function() {
-    const t = LANGS[lang];
+    const currentLang = localStorage.getItem('lang') || 'en';
+    const t = LANGS[currentLang];
     const selected = document.getElementById('exportTableSelect').value;
     const doc = new window.jspdf.jsPDF();
     let head = [], body = [], filename = '';
-    const locale = getLocale();
+    const locale = currentLang === 'my' ? 'my-MM' : 'en-US';
     if (selected === 'main') {
       head = [[t.thMember, t.thInitial, t.thRole]];
       for (let i = 0; i < members.length; i++) {
