@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Company Expense Tracker (Read Only)</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #1976d2;
+      --primary-light: #2196f3;
+      --primary-dark: #1565c0;
+      --secondary: #f4f6fa;
+      --text: #333;
+      --text-light: #666;
+      --success: #4caf50;
+      --warning: #ff9800;
+      --danger: #f44336;
+      --border: #e0e7ef;
+      --card-bg: #fff;
+      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+      --radius: 12px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Roboto', 'Noto Sans Myanmar', 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .app-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      letter-spacing: 0.5px;
+    }
+    .capital-info {
+      font-size: 1rem;
+      margin-top: 5px;
+      opacity: 0.9;
+      margin-bottom: 32px;
+      color: #555;
+    }
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 25px;
+      transition: transform 0.3s;
+    }
+    .card:hover { transform: translateY(-5px); }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border);
+    }
+    .card-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin: 0;
+    }
+    .card-icon {
+      background: var(--primary);
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+    .table-container {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      margin-top: 20px;
+      position: relative;
+      padding-bottom: 32px;
+    }
+    .table-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 20px;
+      background: linear-gradient(to left, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+      pointer-events: none;
+    }
+    .table-container.no-shadow::after {
+      display: none !important;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px 8px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: #e3f2fd;
+      font-weight: 600;
+      color: var(--primary);
+      position: sticky;
+      top: 0;
+      white-space: nowrap;
+    }
+    tr:nth-child(even) { background: #f8fafc; }
+    tr:hover { background: #e3f2fd; }
+    tfoot th {
+      background: #e0e7ef;
+      font-weight: 700;
+      text-align: right;
+    }
+    .summary-row {
+      font-weight: bold;
+      background: #f4f4f4;
+      color: #333;
+    }
+    .project-tag {
+      display: inline-block;
+      background: #e0e7ef;
+      color: #2563eb;
+      font-weight: 600;
+      border-radius: 12px;
+      padding: 2px 12px;
+      font-size: 0.98em;
+      margin: 0;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+    .export-btns { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+    .export-btn { background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 0.98em; cursor: pointer; transition: background 0.2s; }
+    .export-btn:hover { background: #1746a0; }
+    /* Responsive styles */
+    @media (max-width: 900px) {
+      .app-title { font-size: 1.5rem; }
+      .dashboard { grid-template-columns: 1fr; }
+      .card { padding: 20px; }
+      th, td { padding: 8px 6px; }
+      .card-title { font-size: 1.3rem; }
+    }
+    @media (max-width: 768px) {
+      .container { padding: 15px; }
+      .app-title { font-size: 1.3rem; }
+      .capital-info { font-size: 0.9rem; }
+      .card { padding: 15px; }
+      .card-title { font-size: 1.2rem; }
+      /* Responsive Table Styles */
+      .table-container table thead {
+        display: none; /* Hide table headers on mobile */
+      }
+      .table-container table .data-row {
+        display: block;
+        width: 100%;
+        margin-bottom: 1rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1rem;
+        background: #fff !important; /* Override striping for card view */
+        box-shadow: var(--shadow);
+      }
+      .table-container table .data-row td {
+        display: flex;
+        justify-content: space-between;
+        text-align: right;
+        padding: 0.75rem 0.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .table-container table .data-row td:last-child {
+        border-bottom: none;
+      }
+      .table-container table .data-row td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        text-align: left;
+        padding-right: 1rem;
+        color: var(--primary);
+      }
+      /* Prevent summary rows from turning into cards */
+      .table-container table .summary-row td {
+        display: table-cell;
+        text-align: left;
+      }
+      .table-container table .summary-row td:nth-child(2) {
+        text-align: right;
+        font-weight: 600;
+      }
+      /* Force table to not behave like a table on mobile */
+      .table-container table,
+      .table-container table tbody,
+      .table-container table tfoot,
+      .table-container table tr {
+        display: block;
+        width: 100%;
+      }
+      .table-container table tfoot tr {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: #e0e7ef;
+        border-radius: 0 0 var(--radius) var(--radius);
+        margin-top: 1rem;
+      }
+      .table-container table tfoot th {
+        padding: 0;
+        border: none;
+        background: transparent;
+        color: var(--primary-dark);
+        font-weight: 700;
+      }
+      .table-container table tfoot th[colspan] {
+        text-align: left;
+        color: var(--text);
+        font-weight: 600;
+      }
+      /* End Responsive Table Styles */
+    }
+    @media (max-width: 600px) {
+      .card { padding: 12px; }
+      .card-title { font-size: 1.1rem; }
+      th, td { padding: 8px 4px; font-size: 0.9rem; }
+      .summary-value { font-size: 1.5rem; }
+      .table-container { padding-bottom: 16px; }
+    }
+    @media (max-width: 480px) {
+      .container { padding: 10px; }
+      .app-title { font-size: 1.1rem; }
+      .capital-info { font-size: 0.8rem; }
+      .card { padding: 10px; }
+      .card-title { font-size: 1rem; }
+      th, td { padding: 6px 3px; font-size: 0.85rem; }
+    }
+    @media (max-width: 360px) {
+      .app-title { font-size: 1rem; }
+      .card-title { font-size: 0.95rem; }
+      th, td { font-size: 0.8rem; }
+    }
+    @media (max-width: 768px) {
+      .project-tag { font-size: 0.93em; padding: 2px 8px; }
+    }
+    @media (max-width: 480px) {
+      .project-tag { font-size: 0.9em; padding: 2px 6px; }
+    }
+  </style>
+  <!-- SheetJS, jsPDF, html2canvas CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="app-title" id="title"></div>
+    <div class="capital-info" id="capital"></div>
+    <div class="dashboard">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Member Shares</h2>
+          <div class="card-icon"><i class="fas fa-users"></i></div>
+        </div>
+        <div class="export-btns">
+          <button class="export-btn" onclick="exportTableToExcel('memberTable', 'MemberShares')">Export Excel</button>
+          <button class="export-btn" onclick="exportTableToPDF('memberTable', 'MemberShares')">Export PDF</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th id="thMember"></th>
+                <th id="thInitial"></th>
+                <th id="thRole"></th>
+              </tr>
+            </thead>
+            <tbody id="memberTable"></tbody>
+            <tfoot>
+              <tr>
+                <th id="thTotal"></th>
+                <th id="totalInitial"></th>
+                <th id="totalExpenses"></th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="dashboard">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title" id="incomeTitle"></h2>
+          <div class="card-icon"><i class="fas fa-money-bill-wave"></i></div>
+        </div>
+        <div class="export-btns">
+          <button class="export-btn" onclick="exportTableToExcel('incomeTable', 'ProjectIncome')">Export Excel</button>
+          <button class="export-btn" onclick="exportTableToPDF('incomeTable', 'ProjectIncome')">Export PDF</button>
+        </div>
+        <div class="table-container">
+          <table id="incomeTable">
+            <thead>
+              <tr>
+                <th id="thIncomeDate"></th>
+                <th id="thIncomeDesc"></th>
+                <th id="thIncomeAmount"></th>
+                <th id="thIncomeActions"></th>
+              </tr>
+            </thead>
+            <tbody id="incomeBody"></tbody>
+            <tfoot>
+              <tr>
+                <th colspan="3" style="text-align:right;" id="thIncomeTotal"></th>
+                <th id="totalIncome"></th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="dashboard">
+      <div class="card expense-logs">
+        <div class="card-header">
+          <h2 class="card-title" id="logsTitle"></h2>
+          <div class="card-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+        </div>
+        <div class="export-btns">
+          <button class="export-btn" onclick="exportTableToExcel('logTable', 'ExpenseLogs')">Export Excel</button>
+          <button class="export-btn" onclick="exportTableToPDF('logTable', 'ExpenseLogs')">Export PDF</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:8px;flex-wrap:wrap;">
+          <label for="logRowsPerPage" style="font-weight:500;">Rows per page:</label>
+          <select id="logRowsPerPage" style="width:auto;min-width:80px;">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100" selected>100</option>
+          </select>
+          <label for="logMemberFilter" style="font-weight:500;">Member:</label>
+          <select id="logMemberFilter" style="width:auto;min-width:120px;"></select>
+        </div>
+        <div class="table-container">
+          <table id="logTable">
+            <thead>
+              <tr>
+                <th id="thDate"></th>
+                <th id="thDesc"></th>
+                <th id="thProject"></th>
+                <th id="thLogMember"></th>
+                <th id="thAmount"></th>
+              </tr>
+            </thead>
+            <tbody id="logBody"></tbody>
+            <tfoot>
+              <tr>
+                <th colspan="4" id="expenseTotalLabelCell"></th>
+                <th id="expenseTotalCell"></th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBgpl1Rd_Y5gY4X16jzSEpgFXYDPn4FG7w",
+      authDomain: "companytracker-e2f21.firebaseapp.com",
+      databaseURL: "https://companytracker-e2f21-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "companytracker-e2f21",
+      storageBucket: "companytracker-e2f21.firebasestorage.app",
+      messagingSenderId: "83948118379",
+      appId: "1:83948118379:web:a70928e648d1fad9bb2c2e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const initialShare = 15000000;
+    const members = ['Ko Pyae', 'Ko Oo', 'Ko Sut', 'Ko Soe'];
+    const memberTable = document.getElementById("memberTable");
+    const logBody = document.getElementById("logBody");
+    const incomeBody = document.getElementById('incomeBody');
+    const totalIncome = document.getElementById('totalIncome');
+    const thIncomeTotal = document.getElementById('thIncomeTotal');
+    const thTotal = document.getElementById('thTotal');
+    const totalInitial = document.getElementById('totalInitial');
+    const totalExpenses = document.getElementById('totalExpenses');
+    const totalRemaining = document.getElementById('totalRemaining');
+    const LANGS = {
+      en: {
+        title: "Company Expense Tracker",
+        capital: "Starting Capital: <strong>60,000,000 MMK</strong> — Each Member: <strong>15,000,000 MMK</strong>",
+        thMember: "Member",
+        thInitial: "Initial Share",
+        thExpenses: "Expenses",
+        thRemaining: "Remaining",
+        logsTitle: "Expense Logs",
+        logsTitle1: "Project Income Logs",
+        thDate: "Date",
+        thDesc: "Description",
+        thProject: "Project",
+        thLogMember: "Member",
+        thAmount: "Amount",
+        thActions: "Actions",
+        incomeTitle: "Project Income",
+        thIncomeDate: "Date",
+        thIncomeDesc: "Description",
+        thIncomeAmount: "Amount",
+        thIncomeActions: "Total",
+        projectIncomeRow: "Project Income",
+        thRole: "Role",
+        updateRow: "Update",
+        incomeRow: 'Project Income',
+        expenseRow: 'Expenses',
+        expenseTotal: 'Total',
+      },
+      my: {
+        title: "ကုမ္ပဏီအသုံးစရိတ် စာရင်း ",
+        capital: "အစပြုမြန်မာငွေ: <strong>၆၀,၀၀၀,၀၀၀ MMK</strong> — တစ်ဦးလျှင်: <strong>၁၅,၀၀၀,၀၀၀ MMK</strong>",
+        thMember: "အမည်",
+        thInitial: "အစပြုငွေ",
+        thExpenses: "အသုံးစရိတ်",
+        thRemaining: "ကျန်ငွေ",
+        logsTitle: "အသုံးစရိတ် မှတ်တမ်းများ",
+        logsTitle1: "ပရောဂျက်ဝင်ငွေ မှတ်တမ်းများ",
+        thDate: "နေ့စွဲ",
+        thDesc: "ဖော်ပြချက်",
+        thProject: "ပရောဂျက်",
+        thLogMember: "အမည်",
+        thAmount: "ငွေပမာဏ",
+        thActions: "လုပ်ဆောင်ချက်များ",
+        incomeTitle: "ပရောဂျက်ဝင်ငွေ",
+        thIncomeDate: "နေ့စွဲ",
+        thIncomeDesc: "ဖော်ပြချက်",
+        thIncomeAmount: "ငွေပမာဏ",
+        thIncomeActions: "စုစုပေါင်း",
+        projectIncomeRow: "ပရောဂျက်ဝင်ငွေ",
+        thRole: "တာဝန်",
+        updateRow: "အပ်ဒိတ်",
+        incomeRow: 'ပရောဂျက်ဝင်ငွေ',
+        expenseRow: 'အသုံးစရိတ်',
+        expenseTotal: 'စုစုပေါင်း',
+      }
+    };
+    let lang = localStorage.getItem('lang') || 'en';
+    function setLangTexts() {
+      const t = LANGS[lang];
+      document.getElementById('title').textContent = t.title;
+      document.getElementById('capital').innerHTML = t.capital;
+      document.getElementById('thMember').textContent = t.thMember;
+      document.getElementById('thInitial').textContent = t.thInitial;
+      document.getElementById('thRole').textContent = t.thRole;
+      document.getElementById('logsTitle').textContent = t.logsTitle;
+      document.getElementById('thDate').textContent = t.thDate;
+      document.getElementById('thDesc').textContent = t.thDesc;
+      document.getElementById('thProject').textContent = t.thProject;
+      document.getElementById('thLogMember').textContent = t.thLogMember;
+      document.getElementById('thAmount').textContent = t.thAmount;
+      document.getElementById('incomeTitle').textContent = t.incomeTitle;
+      document.getElementById('thIncomeDate').textContent = t.thIncomeDate;
+      document.getElementById('thIncomeDesc').textContent = t.thIncomeDesc;
+      document.getElementById('thIncomeAmount').textContent = t.thIncomeAmount;
+      thIncomeTotal.textContent = t.thIncomeActions;
+    }
+    function renderTable(data) {
+      memberTable.innerHTML = "";
+      let sumInitial = 0;
+      let totalIncomeValue = 0;
+      for (const id in window.currentIncomes) {
+        totalIncomeValue += window.currentIncomes[id].amount || 0;
+      }
+      let totalExpensesValue = 0;
+      for (const id in window.currentLogs) {
+        totalExpensesValue += window.currentLogs[id].amount || 0;
+      }
+      const roles = ['Member', 'Member', 'Member', 'Member'];
+      const t = LANGS[lang];
+      members.forEach((name, i) => {
+        sumInitial += initialShare;
+        memberTable.innerHTML += `
+          <tr class="data-row">
+            <td data-label="${t.thMember}">${name}</td>
+            <td data-label="${t.thInitial}">${initialShare.toLocaleString()}</td>
+            <td data-label="${t.thRole}">${roles[i]}</td>
+          </tr>
+        `;
+      });
+      const netChange = totalIncomeValue - totalExpensesValue;
+      memberTable.innerHTML += `
+        <tr style="font-weight:bold; background:#f4f4f4; color:#333;" class="summary-row">
+          <td>${t.updateRow}</td>
+          <td>${netChange >= 0 ? '+' : ''}${netChange.toLocaleString()}</td>
+          <td></td>
+        </tr>
+      `;
+      memberTable.innerHTML += `
+        <tr style="font-weight:bold; background:#e6ffe6; color:#333;" class="summary-row">
+          <td>${t.incomeRow}</td>
+          <td>+${totalIncomeValue.toLocaleString()}</td>
+          <td></td>
+        </tr>
+      `;
+      memberTable.innerHTML += `
+        <tr style="font-weight:bold; background:#ffe6e6; color:#333;" class="summary-row">
+          <td>${t.expenseRow}</td>
+          <td>-${totalExpensesValue.toLocaleString()}</td>
+          <td></td>
+        </tr>
+      `;
+      const remaining = sumInitial + totalIncomeValue - totalExpensesValue;
+      memberTable.innerHTML += `
+        <tr style="font-weight:bold; background:#e0e7ef; color:#222;" class="summary-row">
+          <td>${t.thRemaining}</td>
+          <td>${remaining.toLocaleString()}</td>
+          <td></td>
+        </tr>
+      `;
+    }
+    function renderLogs(data) {
+      logBody.innerHTML = "";
+      let total = 0;
+      const t = LANGS[lang];
+      let filteredIds = Object.keys(data);
+      const memberFilter = document.getElementById('logMemberFilter').value;
+      if (memberFilter !== 'all') {
+        filteredIds = filteredIds.filter(id => String(data[id].member) === memberFilter);
+      }
+      filteredIds = filteredIds.sort((a, b) => {
+        const da = data[a].date || '';
+        const db = data[b].date || '';
+        return db.localeCompare(da);
+      });
+      const rowsPerPage = parseInt(document.getElementById('logRowsPerPage').value, 10) || 100;
+      const pageIds = filteredIds.slice(0, rowsPerPage);
+      for (const id of pageIds) {
+        const entry = data[id];
+        const date = entry.date ? new Date(entry.date).toLocaleString() : '-';
+        total += entry.amount;
+        logBody.innerHTML += `
+          <tr class="data-row">
+            <td data-label="${t.thDate}">${date}</td>
+            <td data-label="${t.thDesc}">${entry.desc}</td>
+            <td data-label="${t.thProject}"><span class="project-tag">
+              ${entry.project ? entry.project : ''}
+            </span></td>
+            <td data-label="${t.thLogMember}">${members[entry.member]}</td>
+            <td data-label="${t.thAmount}">${entry.amount.toLocaleString()} MMK</td>
+          </tr>
+        `;
+      }
+      document.getElementById('expenseTotalLabelCell').textContent = t.expenseTotal;
+      document.getElementById('expenseTotalCell').textContent = total.toLocaleString() + ' MMK';
+    }
+    function renderIncomes(data) {
+      incomeBody.innerHTML = "";
+      let sumIncome = 0;
+      const t = LANGS[lang];
+      for (const id in data) {
+        const entry = data[id];
+        const date = entry.date ? new Date(entry.date).toLocaleString() : '-';
+        sumIncome += entry.amount;
+        incomeBody.innerHTML += `
+          <tr class="data-row">
+            <td data-label="${t.thIncomeDate}">${date}</td>
+            <td data-label="${t.thIncomeDesc}">${entry.desc}</td>
+            <td data-label="${t.thIncomeAmount}">${entry.amount.toLocaleString()} MMK</td>
+            <td data-label="${t.thIncomeActions}"></td>
+          </tr>
+        `;
+      }
+      thIncomeTotal.textContent = t.thIncomeActions;
+      totalIncome.textContent = sumIncome.toLocaleString() + ' MMK';
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      setLangTexts();
+      document.getElementById('logRowsPerPage').addEventListener('change', () => {
+        renderLogs(window.currentLogs || {});
+      });
+      // Populate member filter
+      const logMemberFilter = document.getElementById('logMemberFilter');
+      logMemberFilter.innerHTML = '<option value="all">All Members</option>';
+      members.forEach((name, i) => {
+        logMemberFilter.innerHTML += `<option value="${i}">${name}</option>`;
+      });
+      logMemberFilter.addEventListener('change', () => {
+        renderLogs(window.currentLogs || {});
+      });
+    });
+    onValue(ref(db, "expenses"), (snapshot) => {
+      const data = snapshot.val() || {};
+      renderTable(data);
+    });
+    onValue(ref(db, "logs"), (snapshot) => {
+      const data = snapshot.val() || {};
+      window.currentLogs = data;
+      renderLogs(data);
+      renderTable({});
+    });
+    onValue(ref(db, "incomes"), (snapshot) => {
+      const data = snapshot.val() || {};
+      window.currentIncomes = data;
+      renderIncomes(data);
+      renderTable({});
+    });
+  </script>
+  <script>
+    // Export table to Excel using SheetJS
+    function exportTableToExcel(tableId, filename) {
+      const table = document.getElementById(tableId);
+      const wb = XLSX.utils.table_to_book(table, {sheet: "Sheet1"});
+      XLSX.writeFile(wb, `${filename}.xlsx`);
+    }
+    // Export table to PDF using jsPDF and html2canvas
+    function exportTableToPDF(tableId, filename) {
+      const table = document.getElementById(tableId);
+      html2canvas(table).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const imgWidth = pageWidth - 40;
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        pdf.addImage(imgData, 'PNG', 20, 20, imgWidth, imgHeight);
+        pdf.save(`${filename}.pdf`);
+      });
+    }
+  </script>
+</body>
+</html> 

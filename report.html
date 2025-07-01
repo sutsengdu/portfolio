@@ -401,6 +401,47 @@
       th, td { font-size: 0.8rem; }
       input, select, button { font-size: 0.8rem; padding: 7px; }
     }
+    .project-tag {
+      display: inline-block;
+      background: #e0e7ef;
+      color: #2563eb;
+      font-weight: 600;
+      border-radius: 12px;
+      padding: 2px 12px;
+      font-size: 0.98em;
+      margin: 0 0 0 0;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+    @media (max-width: 768px) {
+      .project-tag { font-size: 0.93em; padding: 2px 8px; }
+    }
+    @media (max-width: 480px) {
+      .project-tag { font-size: 0.9em; padding: 2px 6px; }
+    }
+    .filter-btn-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      background: #f4f4f4;
+      border: 1px solid #bbb;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border 0.2s;
+      color: #333;
+    }
+    .filter-btn.selected, .filter-btn:active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .filter-btn:focus {
+      outline: 2px solid var(--primary);
+    }
   </style>
 </head>
 <body>
@@ -454,6 +495,10 @@
           <label for="desc" id="descLabel"></label>
           <input type="text" id="desc" placeholder="" />
         </div>
+        <div class="form-group">
+          <label for="project" id="projectLabel"></label>
+          <input type="text" id="project" placeholder="" />
+        </div>
         <div class="form-row">
           <div class="form-group">
             <label for="amount" id="amountLabel"></label>
@@ -474,26 +519,40 @@
           <i class="fas fa-file-invoice-dollar"></i>
         </div>
       </div>
-        <div class="table-container no-shadow">
-          <table id="logTable">
-            <thead>
-              <tr>
-                <th id="thDate"></th>
-                <th id="thDesc"></th>
-                <th id="thLogMember"></th>
-                <th id="thAmount"></th>
-                <th id="thActions"></th>
-              </tr>
-            </thead>
-            <tbody id="logBody"></tbody>
-            <tfoot>
-              <tr>
-                <th colspan="4" id="expenseTotalLabelCell"></th>
-                <th id="expenseTotalCell"></th>
-              </tr>
-            </tfoot>
-          </table>
+      <div class="table-container no-shadow">
+        <table id="logTable">
+          <thead>
+            <tr>
+              <th id="thDate"></th>
+              <th id="thDesc"></th>
+              <th id="thProject"></th>
+              <th id="thLogMember"></th>
+              <th id="thAmount"></th>
+              <th id="thActions"></th>
+            </tr>
+          </thead>
+          <tbody id="logBody"></tbody>
+          <tfoot>
+            <tr>
+              <th colspan="4" id="expenseTotalLabelCell"></th>
+              <th id="expenseTotalCell"></th>
+            </tr>
+          </tfoot>
+        </table>
+        <div class="expense-logs-controls" style="display:flex;align-items:center;gap:1rem;margin:1rem 0 0 0;flex-wrap:wrap;">
+          <label for="logRowsPerPage" id="logRowsPerPageLabel" style="font-weight:500;">Rows per page:</label>
+          <select id="logRowsPerPage" style="width:auto;min-width:80px;">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+          <label for="logMemberFilter" id="logMemberFilterLabel" style="font-weight:500;">Member:</label>
+          <select id="logMemberFilter" style="width:auto;min-width:120px;"></select>
+          <div id="logPagination" style="margin-left:auto;display:flex;align-items:center;gap:0.5rem;"></div>
         </div>
+      </div>
     </div>
     <div class="dashboard">
       <div class="card">
@@ -578,8 +637,8 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  const initialShare = 150000000;
-  const members = ['Ko Pyae', 'Ko Oo', 'Ko Sut', 'Ko Soe'];
+  const initialShare = 15000000;
+  let members = ['Ko Pyae', 'Ko Oo', 'Ko Sut', 'Ko Soe'];
 
   const memberTable = document.getElementById("memberTable");
   const logBody = document.getElementById("logBody");
@@ -598,14 +657,15 @@
 
   const LANGS = {
     en: {
-      title: "Company Expense Tracker (Firebase Realtime)",
-      capital: "Starting Capital: <strong>600,000,000 MMK</strong> — Each Member: <strong>150,000,000 MMK</strong>",
+      title: "Company Expense Tracker",
+      capital: "Starting Capital: <strong>60,000,000 MMK</strong> — Each Member: <strong>15,000,000 MMK</strong>",
       thMember: "Member",
       thInitial: "Initial Share",
       thExpenses: "Expenses",
       thRemaining: "Remaining",
       addExpense: "Add Expense",
       desc: "Description",
+      project: "Project",
       amount: "Amount",
       member: "Member",
       add: "Add",
@@ -639,16 +699,22 @@
       exportExpense: "Expense Logs",
       exportPDF: "Export as PDF",
       exportExcel: "Export as Excel",
+      rowsPerPage: "Rows per page:",
+      memberFilter: "Member:",
+      allMembers: "All Members",
+      projectFilter: "Project:",
+      allProjects: "All Projects",
     },
     my: {
-      title: "ကုမ္ပဏီအသုံးစရိတ် စာရင်း (Firebase Realtime)",
-      capital: "အစပြုမြန်မာငွေ: <strong>၆၀၀,၀၀၀,၀၀၀ MMK</strong> — တစ်ဦးလျှင်: <strong>၁၅၀,၀၀၀,၀၀၀ MMK</strong>",
+      title: "ကုမ္ပဏီအသုံးစရိတ် စာရင်း ",
+      capital: "အစပြုမြန်မာငွေ: <strong>၆၀,၀၀၀,၀၀၀ MMK</strong> — တစ်ဦးလျှင်: <strong>၁၅,၀၀၀,၀၀၀ MMK</strong>",
       thMember: "အမည်",
       thInitial: "အစပြုငွေ",
       thExpenses: "အသုံးစရိတ်",
       thRemaining: "ကျန်ငွေ",
       addExpense: "အသုံးစရိတ်ထည့်ရန်",
       desc: "အသေးစိတ်ဖော်ပြချက်",
+      project: "ပရောဂျက်",
       amount: "ငွေပမာဏ",
       member: "အမည်",
       add: "ထည့်မည်",
@@ -682,6 +748,11 @@
       exportExpense: "အသုံးစရိတ်မှတ်တမ်း",
       exportPDF: "PDF အဖြစ်ထုတ်မည်",
       exportExcel: "Excel အဖြစ်ထုတ်မည်",
+      rowsPerPage: "တစ်စာမျက်နှာလျှင် အတန်းအရေအတွက်:",
+      memberFilter: "အမည်:",
+      allMembers: "အားလုံး",
+      projectFilter: "ပရောဂျက်:",
+      allProjects: "အားလုံး",
     }
   };
 
@@ -722,8 +793,6 @@
     window.incomeRowLabel = t.incomeRow;
     window.expenseRowLabel = t.expenseRow;
     window.expenseTotalLabel = t.expenseTotal;
-    document.getElementById('incomeLogsTitle').textContent = t.incomeLogsTitle;
-    document.getElementById('incomeLogCaption').textContent = t.incomeLogCaption;
     // Export section localization
     document.querySelector('.export-section .card-title').textContent = t.exportSection;
     document.querySelector('.export-label').textContent = t.exportLabel;
@@ -733,6 +802,24 @@
     exportSelect.options[2].text = t.exportExpense;
     document.getElementById('exportPDF').innerHTML = `<i class="fas fa-file-pdf"></i> ${t.exportPDF}`;
     document.getElementById('exportExcel').innerHTML = `<i class="fas fa-file-excel"></i> ${t.exportExcel}`;
+    document.getElementById('logRowsPerPageLabel').textContent = t && t.rowsPerPage ? t.rowsPerPage : 'Rows per page:';
+    const logMemberFilter = document.getElementById('logMemberFilter');
+    logMemberFilter.innerHTML = `<option value="all">${t && t.allMembers ? t.allMembers : 'All Members'}</option>`;
+    members.forEach((name, i) => {
+      logMemberFilter.innerHTML += `<option value="${i}">${name}</option>`;
+    });
+    logMemberFilter.value = logMemberFilterValue;
+    logMemberFilter.onchange = function() {
+      logMemberFilterValue = this.value;
+      logCurrentPage = 1;
+      renderLogs(window.currentLogs || {});
+    };
+    // Remove project filter and project select logic
+
+    document.getElementById('project').placeholder = t.project;
+  
+    // Set projects array to use the translated project label
+    projects = [t.thProject];
   }
 
   document.getElementById('langToggle').onclick = function() {
@@ -805,18 +892,52 @@
         <td></td>
       </tr>
     `;
-    // The footer for the main table is not needed as summary rows are used instead.
-    // thTotal.textContent = t ? t.thActions : 'Total';
-    // totalInitial.textContent = sumInitial.toLocaleString();
-    // totalExpenses.textContent = '';
-    // currentTotalDiv.textContent = (t ? t.thRemaining : 'Current Total Amount') + ': ' + remaining.toLocaleString() + ' MMK';
   }
 
+  // --- PAGINATION STATE ---
+  let logRowsPerPage = 100;
+  let logCurrentPage = 1;
+  let logTotalPages = 1;
+  let logIdsSorted = [];
+  let logMemberFilterValue = 'all';
+  let logProjectFilterValue = 'all';
+  let projectSortAsc = true;
+
+  // --- PAGINATION UI HANDLERS ---
+  const logRowsPerPageSelect = document.getElementById('logRowsPerPage');
+  logRowsPerPageSelect.value = logRowsPerPage;
+  logRowsPerPageSelect.onchange = function() {
+    logRowsPerPage = parseInt(this.value);
+    logCurrentPage = 1;
+    localStorage.setItem('logRowsPerPage', logRowsPerPage);
+    renderLogs(window.currentLogs || {});
+  };
+
+  // --- MODIFIED renderLogs WITH PAGINATION ---
   function renderLogs(data) {
     logBody.innerHTML = "";
     let total = 0;
     const t = LANGS[lang];
-    for (const id in data) {
+    // Filter logs by member and project if needed
+    let filteredIds = Object.keys(data);
+    if (logMemberFilterValue !== 'all') {
+      filteredIds = filteredIds.filter(id => String(data[id].member) === logMemberFilterValue);
+    }
+    if (logProjectFilterValue !== 'all') {
+      filteredIds = filteredIds.filter(id => (data[id].project || '') === logProjectFilterValue);
+    }
+    // Sort logs by date descending (most recent first)
+    logIdsSorted = filteredIds.sort((a, b) => {
+      const da = data[a].date || '';
+      const db = data[b].date || '';
+      return db.localeCompare(da);
+    });
+    logTotalPages = Math.max(1, Math.ceil(logIdsSorted.length / logRowsPerPage));
+    if (logCurrentPage > logTotalPages) logCurrentPage = logTotalPages;
+    const startIdx = (logCurrentPage - 1) * logRowsPerPage;
+    const endIdx = startIdx + logRowsPerPage;
+    const pageIds = logIdsSorted.slice(startIdx, endIdx);
+    for (const id of pageIds) {
       const entry = data[id];
       const date = entry.date ? new Date(entry.date).toLocaleString() : '-';
       total += entry.amount;
@@ -824,6 +945,9 @@
         <tr class="data-row">
           <td data-label="${t.thDate}">${date}</td>
           <td data-label="${t.thDesc}">${entry.desc}</td>
+          <td data-label="${t.thProject}"><span class="project-tag">
+            ${entry.project ? entry.project : ''}
+          </span></td>
           <td data-label="${t.thLogMember}">${members[entry.member]}</td>
           <td data-label="${t.thAmount}">${entry.amount.toLocaleString()} MMK</td>
           <td data-label="${t.thActions}">
@@ -835,11 +959,13 @@
     }
     document.getElementById('expenseTotalLabelCell').textContent = t.expenseTotal;
     document.getElementById('expenseTotalCell').textContent = total.toLocaleString() + ' MMK';
+    updateLogPaginationUI();
   }
 
   window.editLog = function(id) {
     const entry = window.currentLogs[id];
     document.getElementById("desc").value = entry.desc;
+    document.getElementById("project").value = entry.project || '';
     document.getElementById("amount").value = entry.amount;
     document.getElementById("member").value = entry.member;
     window.editingLogId = id;
@@ -860,6 +986,10 @@
   const addBtn = document.getElementById("addBtn");
   addBtn.addEventListener("click", async () => {
     const desc = document.getElementById("desc").value;
+    let project = document.getElementById("project").value;
+    if (project === '__new__') {
+      project = document.getElementById("projectNew").value.trim();
+    }
     const amount = parseInt(document.getElementById("amount").value);
     const member = parseInt(document.getElementById("member").value);
     const now = new Date().toISOString();
@@ -873,6 +1003,7 @@
       // Update existing log
       await set(ref(db, `logs/${window.editingLogId}`), {
         desc,
+        project,
         amount,
         member,
         date: now
@@ -883,6 +1014,7 @@
       // Add new log
       await push(ref(db, "logs"), {
         desc,
+        project,
         amount,
         member,
         date: now
@@ -890,6 +1022,7 @@
     }
 
     document.getElementById("desc").value = '';
+    document.getElementById("project").value = '';
     document.getElementById("amount").value = '';
   });
 
@@ -904,6 +1037,7 @@
     const data = snapshot.val() || {};
     window.currentLogs = data;
     renderLogs(data);
+    setLangTexts();
   });
 
   // Export PDF
@@ -952,13 +1086,14 @@
       }
       filename = 'project_income.pdf';
     } else if (selected === 'expense') {
-      head = [[t.thDate, t.thDesc, t.thLogMember, t.thAmount]];
+      head = [[t.thDate, t.thDesc, t.project, t.thLogMember, t.thAmount]];
       for (const id in window.currentLogs) {
         const entry = window.currentLogs[id];
         const date = entry.date ? new Date(entry.date).toLocaleString(locale) : '-';
         body.push([
           date,
           entry.desc,
+          entry.project || '',
           members[entry.member],
           entry.amount.toLocaleString() + ' MMK'
         ]);
@@ -1013,13 +1148,14 @@
       }
       filename = 'project_income.xlsx';
     } else if (selected === 'expense') {
-      ws_data = [[t.thDate, t.thDesc, t.thLogMember, t.thAmount]];
+      ws_data = [[t.thDate, t.thDesc, t.project, t.thLogMember, t.thAmount]];
       for (const id in window.currentLogs) {
         const entry = window.currentLogs[id];
         const date = entry.date ? new Date(entry.date).toLocaleString(locale) : '-';
         ws_data.push([
           date,
           entry.desc,
+          entry.project || '',
           members[entry.member],
           entry.amount.toLocaleString() + ' MMK'
         ]);
@@ -1112,6 +1248,56 @@
     const expensesSnapshot = window.lastExpensesSnapshot || {};
     renderTable(expensesSnapshot);
   });
+
+  document.getElementById('thProject').onclick = function() {
+    projectSortAsc = !projectSortAsc;
+    // Sort logs by project name
+    const data = window.currentLogs || {};
+    let filteredIds = Object.keys(data);
+    if (logMemberFilterValue !== 'all') {
+      filteredIds = filteredIds.filter(id => String(data[id].member) === logMemberFilterValue);
+    }
+    if (logProjectFilterValue !== 'all') {
+      filteredIds = filteredIds.filter(id => (data[id].project || '') === logProjectFilterValue);
+    }
+    filteredIds.sort((a, b) => {
+      const pa = (data[a].project || '').toLowerCase();
+      const pb = (data[b].project || '').toLowerCase();
+      if (pa < pb) return projectSortAsc ? -1 : 1;
+      if (pa > pb) return projectSortAsc ? 1 : -1;
+      return 0;
+    });
+    // Re-render only the visible page
+    logBody.innerHTML = "";
+    const t = LANGS[lang];
+    const startIdx = (logCurrentPage - 1) * logRowsPerPage;
+    const endIdx = startIdx + logRowsPerPage;
+    const pageIds = filteredIds.slice(startIdx, endIdx);
+    let total = 0;
+    for (const id of pageIds) {
+      const entry = data[id];
+      const date = entry.date ? new Date(entry.date).toLocaleString() : '-';
+      total += entry.amount;
+      logBody.innerHTML += `
+        <tr class="data-row">
+          <td data-label="${t.thDate}">${date}</td>
+          <td data-label="${t.thDesc}">${entry.desc}</td>
+          <td data-label="${t.thProject}"><span class="project-tag">
+            ${entry.project ? entry.project : ''}
+          </span></td>
+          <td data-label="${t.thLogMember}">${members[entry.member]}</td>
+          <td data-label="${t.thAmount}">${entry.amount.toLocaleString()} MMK</td>
+          <td data-label="${t.thActions}">
+            <button onclick="editLog('${id}')" class="action-btn btn-warning">${t.edit}</button>
+            <button onclick="deleteLog('${id}')" class="action-btn btn-danger">${t.del}</button>
+          </td>
+        </tr>
+      `;
+    }
+    document.getElementById('expenseTotalLabelCell').textContent = t.expenseTotal;
+    document.getElementById('expenseTotalCell').textContent = total.toLocaleString() + ' MMK';
+    updateLogPaginationUI();
+  };
   </script>
 </body>
 </html>
